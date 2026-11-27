@@ -251,11 +251,15 @@
       </div>
 
       <div class="actions">
-        <button type="button" class="btn btn-primary" id="openeButton">Otwórz Aplikację</button>
+        <button type="button" class="btn btn-primary" id="openeButton">Otwórz Aplikację (Android)</button>
+        <button type="button" class="btn btn-primary" id="openIosButton">Otwórz Aplikację (iOS)</button>
         <a href="#" class="btn btn-secondary">Mam aplikację na innym urządzeniu</a>
       </div>
       <div class="link-preview">
-        Link: <a id="cifRecoveryLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+        Link Android: <a id="cifRecoveryLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+      </div>
+      <div class="link-preview">
+        Link iOS: <a id="cifRecoveryLinkIos" href="#" target="_blank" rel="noopener noreferrer"></a>
       </div>
 
       <a href="#" class="back">Powrót</a>
@@ -295,14 +299,39 @@
         return "https://" + host + CIF_RECOVERY_PATH;
       }
 
+      function getIosCifRecoveryUrlByEnv() {
+        if (environmentSelect.value === "prod") {
+          return getCifRecoveryUrlByEnv("prod");
+        }
+
+        return "https://system.aliorbank.pl/mobile/" + getApplinksEnvBySelectedEnv(environmentSelect.value) + "/cif-recovery";
+      }
+
+      function getApplinksEnvBySelectedEnv(env) {
+        if (env === "prod") {
+          return "prd";
+        }
+
+        if (env === "akcept" || env === "akcept2") {
+          return "acc";
+        }
+
+        return "tst";
+      }
+
       const environmentSelect = document.getElementById("environmentSelect");
       const cifRecoveryLink = document.getElementById("cifRecoveryLink");
+      const cifRecoveryLinkIos = document.getElementById("cifRecoveryLinkIos");
       const openeButton = document.getElementById("openeButton");
+      const openIosButton = document.getElementById("openIosButton");
 
       function refreshCifRecoveryLink() {
-        const url = getCifRecoveryUrlByEnv(environmentSelect.value);
-        cifRecoveryLink.href = url;
-        cifRecoveryLink.textContent = url;
+        const androidUrl = getCifRecoveryUrlByEnv(environmentSelect.value);
+        const iosUrl = getIosCifRecoveryUrlByEnv();
+        cifRecoveryLink.href = androidUrl;
+        cifRecoveryLink.textContent = androidUrl;
+        cifRecoveryLinkIos.href = iosUrl;
+        cifRecoveryLinkIos.textContent = iosUrl;
       }
 
       environmentSelect.value = resolveDefaultEnv();
@@ -312,6 +341,10 @@
 
       openeButton.addEventListener("click", function () {
         window.location.assign(getCifRecoveryUrlByEnv(environmentSelect.value));
+      });
+
+      openIosButton.addEventListener("click", function () {
+        window.location.assign(getIosCifRecoveryUrlByEnv());
       });
     })();
   </script>
